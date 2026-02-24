@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <script src="{{ url_for('static', filename='builder.js') }}" defer></script>
+    <title>monkeytypecard</title>
+  </head>
+  <body>
+    <h1>monkeytypecard</h1>
+
+    <div class="grid">
+      <div class="row">
+        <label for="username">Username</label>
+        <input id="username" value="punkk" />
+      </div>
+
+      <div class="row">
+        <label for="theme">Theme</label>
+        <select id="theme">
+          <option value="midnight">midnight</option>
+          <option value="dark">dark</option>
+          <option value="light">light</option>
+          <option value="tokyonight">tokyonight</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="wordValue">Word Value</label>
+        <select id="wordValue">
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">120</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="timeValue">Time Value</label>
+        <select id="timeValue">
+          <option value="15" selected>15</option>
+          <option value="30">30</option>
+          <option value="60">60</option>
+          <option value="120">120</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="previewBtn" type="button">Preview</button>
+      <button id="copyUrlBtn" type="button">Copy URL</button>
+      <button id="copyMdBtn" type="button">Copy Markdown</button>
+    </div>
+
+    <div class="preview">
+      <img id="cardPreview" alt="Card preview" />
+    </div>
+
+    <textarea id="output" readonly></textarea>
+  </body>
+</html>
