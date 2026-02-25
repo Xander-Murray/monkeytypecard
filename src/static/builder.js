@@ -13,7 +13,7 @@ function buildUrl() {
     wordValue: wordValueEl.value,
     timeValue: timeValueEl.value,
   });
-  return `${window.location.origin}/api/monkeytype.svg?${params.toString()}`;
+  return `${window.location.origin}/monkeytype.svg?${params.toString()}`;
 }
 
 function preview() {

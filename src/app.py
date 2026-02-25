@@ -10,7 +10,6 @@ THEMES = {
         "border": "#2b3340",  # inner border stroke
         "fg": "#d7dbe2",  # bright text
         "muted": "#7b8494",  # medium gray labels
-        "muted2": "#5e6674",  # darker muted numbers
         "accent": "#76d9f4",  # cyan numbers/name
         "accent2": "#f1c40f",  # logo yellow
     }
@@ -23,7 +22,7 @@ def builder():
     return render_template("builder.html")
 
 
-@app.get("/api/monkeytype.svg")
+@app.get("/monkeytype.svg")
 def monkeytype_svg():
     username = request.args.get("username", "guest").strip()
     theme_name = request.args.get("theme", "midnight").strip()
@@ -79,55 +78,56 @@ def render_monkeytype_card(
     username_esc = escape(username)
     mode_esc = escape(mode_label)
 
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="980" height="360" viewBox="0 0 980 360">
-  <!-- Outer background -->
-  <rect x="0" y="0" width="980" height="360" rx="34" fill="{theme["page_bg"]}"/>
+    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="760" height="279" viewBox="0 0 980 360">
+  <g transform="scale(0.65)">
+    <!-- Outer background -->
+    <rect x="0" y="0" width="980" height="360" rx="34" fill="{theme["page_bg"]}"/>
 
-  <!-- Main card -->
-  <rect x="26" y="26" width="928" height="308" rx="28" fill="{theme["card_bg"]}" stroke="{theme["border"]}" stroke-width="4"/>
+    <!-- Main card -->
+    <rect x="26" y="26" width="928" height="308" rx="28" fill="{theme["card_bg"]}" stroke="{theme["border"]}" stroke-width="4"/>
 
-  <!-- Header -->
-  <g>
-    <!-- Simple logo pill placeholder -->
-    <rect x="290" y="56" width="88" height="44" rx="12" fill="none" stroke="{theme["accent2"]}" stroke-width="4"/>
-    <text x="392" y="89" fill="{theme["muted2"]}" font-size="34" font-weight="700"
-          font-family="Inter, Segoe UI, Arial, sans-serif">monkeytype</text>
-  </g>
+    <!-- Header -->
+    <g>
+      <rect x="290" y="56" width="88" height="44" rx="12" fill="none" stroke="{theme["accent2"]}" stroke-width="4"/>
+      <text x="392" y="89" fill="{theme["muted2"]}" font-size="34" font-weight="700"
+            font-family="Inter, Segoe UI, Arial, sans-serif">monkeytype</text>
+    </g>
 
-  <!-- Left profile section -->
-  <g>
-    <text x="96" y="192" fill="{theme["accent"]}" font-size="72" font-weight="700"
-          font-family="Inter, Segoe UI, Arial, sans-serif">{username_esc}</text>
+    <!-- Left profile section -->
+    <g>
+      <text x="96" y="192" fill="{theme["accent"]}" font-size="72" font-weight="700"
+            font-family="Inter, Segoe UI, Arial, sans-serif">{username_esc}</text>
 
-    <text x="98" y="232" fill="{theme["muted"]}" font-size="28"
-          font-family="Inter, Segoe UI, Arial, sans-serif">{mode_esc}</text>
+      <text x="98" y="232" fill="{theme["muted"]}" font-size="28"
+            font-family="Inter, Segoe UI, Arial, sans-serif">{mode_esc}</text>
 
-    <text x="98" y="288" fill="{theme["fg"]}" font-size="54" font-weight="600"
-          font-family="Inter, Segoe UI, Arial, sans-serif">21:27:19</text>
-  </g>
+      <text x="98" y="288" fill="{theme["fg"]}" font-size="54" font-weight="600"
+            font-family="Inter, Segoe UI, Arial, sans-serif">21:27:19</text>
+    </g>
 
-  <!-- Middle stat column -->
-  <g>
-    <text x="460" y="142" fill="{theme["muted"]}" font-size="30"
-          font-family="Inter, Segoe UI, Arial, sans-serif">{secondCount} seconds</text>
+    <!-- Middle stat column -->
+    <g>
+      <text x="460" y="142" fill="{theme["muted"]}" font-size="30"
+            font-family="Inter, Segoe UI, Arial, sans-serif">{secondCount} seconds</text>
 
-    <text x="450" y="232" fill="{theme["accent"]}" font-size="92" font-weight="700"
-          font-family="Inter, Segoe UI, Arial, sans-serif">{left_stat}</text>
+      <text x="450" y="232" fill="{theme["accent"]}" font-size="92" font-weight="700"
+            font-family="Inter, Segoe UI, Arial, sans-serif">{left_stat}</text>
 
-    <text x="476" y="304" fill="{theme["muted2"]}" font-size="58" font-weight="500"
-          font-family="Inter, Segoe UI, Arial, sans-serif">{left_acc}%</text>
-  </g>
+      <text x="460" y="304" fill="{theme["muted"]}" font-size="58" font-weight="500"
+            font-family="Inter, Segoe UI, Arial, sans-serif">{left_acc}%</text>
+    </g>
 
-  <!-- Right stat column -->
-  <g>
-    <text x="706" y="142" fill="{theme["muted"]}" font-size="30"
-          font-family="Inter, Segoe UI, Arial, sans-serif">{wordCount} words</text>
+    <!-- Right stat column -->
+    <g>
+      <text x="706" y="142" fill="{theme["muted"]}" font-size="30"
+            font-family="Inter, Segoe UI, Arial, sans-serif">{wordCount} words</text>
 
-    <text x="690" y="232" fill="{theme["accent"]}" font-size="92" font-weight="700"
-          font-family="Inter, Segoe UI, Arial, sans-serif">{right_stat}</text>
+      <text x="690" y="232" fill="{theme["accent"]}" font-size="92" font-weight="700"
+            font-family="Inter, Segoe UI, Arial, sans-serif">{right_stat}</text>
 
-    <text x="706" y="304" fill="{theme["muted"]}" font-size="58" font-weight="500"
-          font-family="Inter, Segoe UI, Arial, sans-serif">{right_acc}%</text>
+      <text x="706" y="304" fill="{theme["muted"]}" font-size="58" font-weight="500"
+            font-family="Inter, Segoe UI, Arial, sans-serif">{right_acc}%</text>
+    </g>
   </g>
 </svg>'''
     return svg
