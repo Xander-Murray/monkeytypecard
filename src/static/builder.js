@@ -6,6 +6,7 @@ const previewImg = document.getElementById("cardPreview");
 const output = document.getElementById("output");
 const themeGrid = document.getElementById("themeGrid");
 const themeSearch = document.getElementById("themeSearch");
+const randBtn = document.getElementById("randomTheme");
 
 let themes = [];
 
@@ -98,6 +99,19 @@ document.getElementById("copyMdBtn").addEventListener("click", async () => {
   showToast("Markdown copied!");
 });
 
+randBtn.addEventListener("click", () => {
+  if (themes.length === 0) return;
+  const randTheme = themes[Math.floor(Math.random() * themes.length)];
+  themeEl.value = randTheme.name;
+  themeGrid
+    .querySelectorAll(".theme-btn")
+    .forEach((b) => b.classList.remove("active"));
+  const activeBtn = [...themeGrid.children].find(
+    (b) => b.querySelector(".theme-name").textContent === randTheme.name,
+  );
+  if (activeBtn) activeBtn.classList.add("active");
+  preview();
+});
 // Auto-preview on control change
 [usernameEl, wordValueEl, timeValueEl].forEach((el) => {
   el.addEventListener("change", preview);
