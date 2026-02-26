@@ -3,63 +3,78 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
     <script src="{{ url_for('static', filename='builder.js') }}" defer></script>
     <title>monkeytypecard</title>
   </head>
   <body>
-    <h1>monkeytypecard</h1>
+    <header>
+      <h1>monkeytype<span class="accent">card</span></h1>
+      <p class="subtitle">generate a stats card for your readme</p>
+    </header>
 
-    <div class="grid">
-      <div class="row">
-        <label for="username">Username</label>
-        <input id="username" value="punkk" />
-      </div>
+    <main>
+      <section class="controls">
+        <div class="field">
+          <label for="username">username</label>
+          <input id="username" value="punkk" placeholder="your monkeytype username" spellcheck="false" />
+        </div>
 
-      <div class="row">
-        <label for="theme">Theme</label>
-        <select id="theme">
-          <option value="midnight">midnight</option>
-          <option value="dark">dark</option>
-          <option value="light">light</option>
-          <option value="tokyonight">tokyonight</option>
-        </select>
-      </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="wordValue">words</label>
+            <select id="wordValue">
+              <option value="10" selected>10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="timeValue">time</label>
+            <select id="timeValue">
+              <option value="15" selected>15</option>
+              <option value="30">30</option>
+              <option value="60">60</option>
+              <option value="120">120</option>
+            </select>
+          </div>
+        </div>
 
-      <div class="row">
-        <label for="wordValue">Word Value</label>
-        <select id="wordValue">
-          <option value="10" selected>10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value="100">120</option>
-        </select>
-      </div>
+        <div class="field">
+          <label>theme</label>
+          <div class="theme-search-wrap">
+            <input id="themeSearch" type="text" placeholder="search themes..." spellcheck="false" />
+          </div>
+          <div id="themeGrid" class="theme-grid"></div>
+          <input type="hidden" id="theme" value="serika_dark" />
+        </div>
+      </section>
 
-      <div class="row">
-        <label for="timeValue">Time Value</label>
-        <select id="timeValue">
-          <option value="15" selected>15</option>
-          <option value="30">30</option>
-          <option value="60">60</option>
-          <option value="120">120</option>
-        </select>
-      </div>
-    </div>
+      <section class="output-section">
+        <div class="preview-card">
+          <img id="cardPreview" alt="Card preview" />
+        </div>
 
-    <div class="actions">
-      <button id="previewBtn" type="button">Preview</button>
-      <button id="copyUrlBtn" type="button">Copy URL</button>
-      <button id="copyMdBtn" type="button">Copy Markdown</button>
-    </div>
+        <div class="actions">
+          <button id="previewBtn" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview
+          </button>
+          <button id="copyUrlBtn" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Copy URL
+          </button>
+          <button id="copyMdBtn" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            Copy Markdown
+          </button>
+        </div>
 
-    <div class="preview">
-      <img id="cardPreview" alt="Card preview" />
-    </div>
-
-    <textarea id="output" readonly></textarea>
+        <div class="url-output">
+          <textarea id="output" readonly placeholder="your card url will appear here..."></textarea>
+        </div>
+      </section>
+    </main>
   </body>
 </html>
