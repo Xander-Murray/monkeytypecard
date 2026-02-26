@@ -67,13 +67,23 @@ def monkeytype_svg():
 
     theme = theme_to_card_colors(THEMES[theme_name])
 
+    try:
+        user_profile = services.monkeytype.get_profile(username)
+    except Exception:
+        # send message on front end that user not found
+        return Response("Could not fetch profile for that username", status=502)
+
+    stats = services.monkeytype.get_card_stats_from_profile(
+        user_profile, int(timeValue), int(wordValue)
+    )
+
     svg = render_monkeytype_card(
         username=username,
-        mode_label="time typing",
-        left_stat=128,
-        right_stat=166,
-        left_acc=100,
-        right_acc=100,
+        time_typing=stats["time_typing"],
+        left_stat=stats["time_wpm"],
+        right_stat=stats["words_wpm"],
+        left_acc=stats["time_acc"],
+        right_acc=stats["words_acc"],
         secondCount=timeValue,
         wordCount=wordValue,
         theme=theme,
@@ -85,7 +95,7 @@ def monkeytype_svg():
 
 def render_monkeytype_card(
     username,
-    mode_label,
+    time_typing,
     left_stat,
     right_stat,
     left_acc,
@@ -95,7 +105,6 @@ def render_monkeytype_card(
     theme,
 ):
     username_esc = escape(username)
-    mode_esc = escape(mode_label)
 
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="495" height="180" viewBox="0 0 990 360">
   <defs>
@@ -176,9 +185,9 @@ def render_monkeytype_card(
 
   <!-- Bottom-left joined time -->
     <text x="58" y="280" fill="{theme["muted"]}" font-size="20" font-weight="400" letter-spacing="2"
-          font-family="Lexend Deca, Inter, Segoe UI, sans-serif" opacity="0.7">{mode_esc}</text>
+          font-family="Lexend Deca, Inter, Segoe UI, sans-serif" opacity="0.7">time typing</text>
   <text x="58" y="316" fill="{theme["fg"]}" font-size="32" font-weight="300" letter-spacing="1" opacity="0.4"
-        font-family="Lexend Deca, Inter, Segoe UI, sans-serif">21:27:19</text>
+        font-family="Lexend Deca, Inter, Segoe UI, sans-serif">{time_typing}</text>
 </svg>'''
     return svg
 
