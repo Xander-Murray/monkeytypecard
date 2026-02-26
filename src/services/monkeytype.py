@@ -1,26 +1,5 @@
-import os
 import requests
-from dotenv import load_dotenv
-
-# load_dotenv()
-#
-# api_key = os.getenv("APEKEY")
-# if not api_key:
-#     raise ValueError("APEKEY is not set")
-#
-# headers = {"Authorization": f"ApeKey {api_key}"}
-# params = {"mode": "words", "mode2": "10"}
-#
-# r = requests.get(
-#     "https://api.monkeytype.com/users/personalBests",
-#     headers=headers,
-#     params=params,
-#     timeout=5,
-# )
-# print("url:", r.url)
-# print("status:", r.status_code)
-# print("content-type:", r.headers.get("content-type"))
-# print(r.text[:1000])
+from datetime import timedelta
 
 
 def get_profile(username: str):
@@ -38,10 +17,20 @@ def best_result(results: list[dict]):
     return max(results, key=lambda x: x.get("wpm", 0))
 
 
-def get_card_stats_from_profile(profile_json, time_value: str, word_value: str):
+def normalize_time(time: str) -> str:
+    td = timedelta(seconds=round(float(time)))
+    total = int(td.total_seconds())
+    h, rem = divmod(total, 3600)
+    m, s = divmod(rem, 60)
+    return f"{h:02d}:{m:02d}:{s:02d}"
+
+
+def get_card_stats_from_profile(profile_json, time_value: int, word_value: int) -> dict:
     data = profile_json.get("data", {})
     pbs = data.get("personalBests", {})
+    typing_stats = data.get("typingStats", {})
 
+    time_typing = normalize_time(typing_stats.get("timeTyping", "0"))
     time_bucket = pbs.get("time", {}).get(str(time_value), [])
     word_bucket = pbs.get("words", {}).get(str(word_value), [])
 
@@ -50,10 +39,11 @@ def get_card_stats_from_profile(profile_json, time_value: str, word_value: str):
 
     return {
         "name": data.get("name", "user"),
-        "time_wpm": round(best_time.get("wpm", 0), 2) if best_time else 0,
-        "time_acc": round(best_time.get("acc", 0), 2) if best_time else 0,
-        "words_wpm": round(best_words.get("wpm", 0), 2) if best_words else 0,
-        "words_acc": round(best_words.get("acc", 0), 2) if best_words else 0,
+        "time_typing": time_typing,
+        "time_wpm": int(round(best_time.get("wpm", 0), 0)) if best_time else "--",
+        "time_acc": round(best_time.get("acc", 0), 0) if best_time else "--",
+        "words_wpm": int(round(best_words.get("wpm", 0), 0)) if best_words else "--",
+        "words_acc": round(best_words.get("acc", 0), 0) if best_words else "--",
         "time_found": best_time is not None,
         "words_found": best_words is not None,
     }
