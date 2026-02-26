@@ -2,7 +2,7 @@
 
 Generate an SVG stats card for your [Monkeytype](https://monkeytype.com) profile to embed in your GitHub README.
 
-![monkeytypecard example](img/example-card.svg)
+![monkeytypecard example](imgs/example-card.svg)
 
 ## Features
 
