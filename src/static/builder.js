@@ -77,12 +77,10 @@ async function loadThemes() {
   renderThemes();
 }
 
-// Search filter
 themeSearch.addEventListener("input", () => {
   renderThemes(themeSearch.value);
 });
 
-// Copy handlers
 document.getElementById("previewBtn").addEventListener("click", preview);
 
 document.getElementById("copyUrlBtn").addEventListener("click", async () => {
@@ -105,7 +103,6 @@ document.getElementById("copyMdBtn").addEventListener("click", async () => {
   el.addEventListener("change", preview);
 });
 
-// Debounce username input
 let debounce;
 usernameEl.addEventListener("input", () => {
   clearTimeout(debounce);
