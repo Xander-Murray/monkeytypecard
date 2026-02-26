@@ -129,6 +129,21 @@ select {
 
 .theme-search-wrap {
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#themeSearch {
+  flex: 1;
+}
+
+#randomTheme {
+  display: inline-flex;
+  align-items: center;
+  height: 2.25rem;
+  width: 2.25rem;
+  padding: 0;
 }
 
 .theme-grid {
@@ -162,7 +177,9 @@ select {
   border: 2px solid transparent;
   background: none;
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
   min-height: 32px;
 }
 
@@ -245,7 +262,9 @@ button {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 button:hover {
@@ -295,7 +314,9 @@ button svg {
   font-weight: 600;
   pointer-events: none;
   opacity: 0;
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
   z-index: 100;
 }
 
