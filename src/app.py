@@ -1,5 +1,6 @@
 import json
 import os
+import time as time_mod
 from flask import Flask, request, Response, render_template, jsonify
 from xml.sax.saxutils import escape
 import services.monkeytype
@@ -11,6 +12,30 @@ with open(THEMES_PATH) as f:
     THEMES_LIST = json.load(f)
 
 THEMES = {t["name"]: t for t in THEMES_LIST}
+
+ALLOWED_TIME_VALUES = {"15", "30", "60", "120"}
+ALLOWED_WORD_VALUES = {"10", "25", "50", "100"}
+
+RATE_LIMIT_WINDOW = 60  # seconds
+RATE_LIMIT_MAX = 30  # max SVG requests per IP per window
+_rate_limits = {}
+
+
+def _is_rate_limited(ip: str) -> bool:
+    """Check if an IP has exceeded the SVG request limit.
+    Cleans up expired timestamps on each call."""
+    now = time_mod.time()
+    cutoff = now - RATE_LIMIT_WINDOW
+
+    timestamps = _rate_limits.get(ip, [])
+    timestamps = [t for t in timestamps if t > cutoff]
+    _rate_limits[ip] = timestamps
+
+    if len(timestamps) >= RATE_LIMIT_MAX:
+        return True
+
+    timestamps.append(now)
+    return False
 
 
 def theme_to_card_colors(t):
@@ -24,6 +49,27 @@ def theme_to_card_colors(t):
         "accent": t["mainColor"],
         "accent2": t.get("caretColor", t["mainColor"]),
     }
+
+
+def render_error_svg(message: str, theme: dict) -> str:
+    """Return a styled SVG with an error message instead of a broken image.
+    Uses the same card dimensions/colors so it looks intentional, not broken."""
+    msg_esc = escape(message)
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="495" height="180" viewBox="0 0 990 360">
+  <rect width="990" height="360" rx="20" fill="{theme["page_bg"]}"/>
+  <rect x="16" y="16" width="958" height="328" rx="16" fill="{theme["card_bg"]}"
+        stroke="{theme["border"]}" stroke-width="2" stroke-opacity="0.5"/>
+  <text x="495" y="170" text-anchor="middle" fill="{theme["muted"]}" font-size="28"
+        font-family="Lexend Deca, Inter, Segoe UI, sans-serif" font-weight="400">{msg_esc}</text>
+  <text x="495" y="210" text-anchor="middle" fill="{theme["accent"]}" font-size="20"
+        font-family="Lexend Deca, Inter, Segoe UI, sans-serif" font-weight="300" opacity="0.7">monkeytypecard</text>
+</svg>'''
+
+
+def _svg_response(svg: str, status: int = 200) -> Response:
+    resp = Response(svg, status=status, mimetype="image/svg+xml")
+    resp.headers["Cache-Control"] = "public, max-age=300"
+    return resp
 
 
 @app.get("/")
@@ -53,25 +99,51 @@ def api_themes():
 def monkeytype_svg():
     username = request.args.get("username", "guest").strip()
     theme_name = request.args.get("theme", "serika_dark").strip()
-    wordValue = request.args.get("wordValue", "10")
-    timeValue = request.args.get("timeValue", "15")
+    wordValue = request.args.get("wordValue", "10").strip()
+    timeValue = request.args.get("timeValue", "15").strip()
 
-    if not username:
-        username = "user"
-
+    # Resolve theme first so error SVGs can use it
     if theme_name not in THEMES:
         theme_name = "serika_dark"
-
-    if not timeValue.isdigit() or not wordValue.isdigit():
-        return Response("Invalid time or word value", status=400)
-
     theme = theme_to_card_colors(THEMES[theme_name])
+
+    client_ip = request.remote_addr or "unknown"
+    if _is_rate_limited(client_ip):
+        return _svg_response(
+            render_error_svg("rate limited — try again in a minute", theme), 429
+        )
+
+    if not username or not services.monkeytype.is_valid_username(username):
+        return _svg_response(render_error_svg("invalid username", theme), 400)
+
+    if timeValue not in ALLOWED_TIME_VALUES:
+        return _svg_response(
+            render_error_svg(
+                f"invalid time value (use {', '.join(sorted(ALLOWED_TIME_VALUES))})",
+                theme,
+            ),
+            400,
+        )
+    if wordValue not in ALLOWED_WORD_VALUES:
+        return _svg_response(
+            render_error_svg(
+                f"invalid word value (use {', '.join(sorted(ALLOWED_WORD_VALUES))})",
+                theme,
+            ),
+            400,
+        )
 
     try:
         user_profile = services.monkeytype.get_profile(username)
     except Exception:
-        # send message on front end that user not found
-        return Response("Could not fetch profile for that username", status=502)
+        return _svg_response(
+            render_error_svg(f'could not find user "{username}"', theme), 502
+        )
+
+    if services.monkeytype.is_profile_private(user_profile):
+        return _svg_response(
+            render_error_svg(f'"{username}" has a private profile', theme)
+        )
 
     stats = services.monkeytype.get_card_stats_from_profile(
         user_profile, int(timeValue), int(wordValue)
@@ -88,9 +160,7 @@ def monkeytype_svg():
         wordCount=wordValue,
         theme=theme,
     )
-    resp = Response(svg, mimetype="image/svg+xml")
-    resp.headers["Cache-Control"] = "public, max-age=300"
-    return resp
+    return _svg_response(svg)
 
 
 def render_monkeytype_card(
