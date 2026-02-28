@@ -1,10 +1,12 @@
 import requests
+from collections import OrderedDict
 from datetime import timedelta
 import time as time_mod
 import re
 
-_profile_cache = {}
+_profile_cache = OrderedDict()
 CACHE_TTL_SECONDS = 300  # 5 minutes
+CACHE_MAX_ENTRIES = 2000
 
 
 def get_profile(username: str):
@@ -24,6 +26,9 @@ def get_profile(username: str):
     data = r.json()
 
     _profile_cache[username] = {"data": data, "ts": now}
+    _profile_cache.move_to_end(username)
+    while len(_profile_cache) > CACHE_MAX_ENTRIES:
+        _profile_cache.popitem(last=False)
     return data
 
 
