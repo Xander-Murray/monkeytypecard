@@ -21,6 +21,17 @@
   --font-mono: "Roboto Mono", "SF Mono", "Fira Code", monospace;
 }
 
+body.light {
+  --bg: #e5e5e0;
+  --bg-secondary: #d6d6d1;
+  --surface: #cdcdc8;
+  --border: #b8b8b3;
+  --text: #323437;
+  --text-muted: #959896;
+  --accent: #e2b714;
+  --accent-dim: rgba(226, 183, 20, 0.2);
+}
+
 body {
   font-family: var(--font);
   background: var(--bg);
@@ -32,6 +43,39 @@ body {
 header {
   text-align: center;
   padding: 3rem 1rem 1.5rem;
+  position: relative;
+}
+
+#themeToggle {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  padding: 0.5rem;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  line-height: 0;
+}
+
+#themeToggle .icon-sun,
+#themeToggle .icon-moon {
+  display: none;
+}
+
+#themeToggle .icon-sun {
+  display: block;
+}
+#themeToggle .icon-moon {
+  display: none;
+}
+
+body.light #themeToggle .icon-sun {
+  display: none;
+}
+body.light #themeToggle .icon-moon {
+  display: block;
 }
 
 header h1 {
@@ -127,10 +171,11 @@ select {
 
 /* --- Theme grid --- */
 
+/* Stretch both children to the same height so the button matches the input */
 .theme-search-wrap {
   margin-bottom: 0.5rem;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 0.5rem;
 }
 
@@ -138,12 +183,24 @@ select {
   flex: 1;
 }
 
+/* Square button that matches the input height exactly.
+   The input has padding 0.65rem top+bottom + font-size 0.9rem + 2px border = total height.
+   We mirror the same padding/font-size so the browser computes the same height,
+   then force square with aspect-ratio. */
 #randomTheme {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  height: 2.25rem;
-  width: 2.25rem;
-  padding: 0;
+  justify-content: center;
+  padding: 0.65rem;
+  font-size: 0.9rem;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+}
+
+#randomTheme svg {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
 }
 
 .theme-grid {
@@ -323,6 +380,77 @@ button svg {
 .toast.show {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
+}
+
+/* --- Loading & error states for preview --- */
+
+.preview-card.loading {
+  position: relative;
+}
+
+.preview-card.loading::after {
+  content: "loading...";
+  position: absolute;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.preview-card.loading img {
+  opacity: 0;
+}
+
+.preview-card.error {
+  position: relative;
+}
+
+.preview-card.error img {
+  display: none;
+}
+
+.preview-card.error::after {
+  content: attr(data-error);
+  position: absolute;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+}
+
+/* --- Footer --- */
+
+footer {
+  text-align: center;
+  padding: 1.5rem 1rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.15s;
+}
+
+footer a:hover {
+  color: var(--accent);
+}
+
+footer .footer-note {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  opacity: 0.5;
+}
+
+body.light select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23959896' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
 
 /* --- Responsive --- */
