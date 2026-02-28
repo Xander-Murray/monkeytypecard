@@ -1,9 +1,17 @@
 import json
+import logging
 import os
 import time as time_mod
+from collections import OrderedDict
 from flask import Flask, request, Response, render_template, jsonify
 from xml.sax.saxutils import escape
+import requests.exceptions
 import services.monkeytype
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
 
 app = Flask(__name__)
 
@@ -18,7 +26,8 @@ ALLOWED_WORD_VALUES = {"10", "25", "50", "100"}
 
 RATE_LIMIT_WINDOW = 60  # seconds
 RATE_LIMIT_MAX = 30  # max SVG requests per IP per window
-_rate_limits = {}
+RATE_LIMIT_MAX_IPS = 10_000  # cap tracked IPs to bound memory
+_rate_limits = OrderedDict()
 
 
 def _is_rate_limited(ip: str) -> bool:
@@ -29,12 +38,23 @@ def _is_rate_limited(ip: str) -> bool:
 
     timestamps = _rate_limits.get(ip, [])
     timestamps = [t for t in timestamps if t > cutoff]
-    _rate_limits[ip] = timestamps
+
+    if not timestamps:
+        _rate_limits.pop(ip, None)
+    else:
+        _rate_limits[ip] = timestamps
+        _rate_limits.move_to_end(ip)
+
+    # Evict oldest entries if we're tracking too many IPs
+    while len(_rate_limits) > RATE_LIMIT_MAX_IPS:
+        _rate_limits.popitem(last=False)
 
     if len(timestamps) >= RATE_LIMIT_MAX:
         return True
 
     timestamps.append(now)
+    _rate_limits[ip] = timestamps
+    _rate_limits.move_to_end(ip)
     return False
 
 
@@ -135,9 +155,26 @@ def monkeytype_svg():
 
     try:
         user_profile = services.monkeytype.get_profile(username)
-    except Exception:
+    except requests.exceptions.HTTPError as e:
+        status = e.response.status_code if e.response is not None else 502
+        if status == 404:
+            logging.warning("User not found: %s", username)
+            return _svg_response(
+                render_error_svg(f'could not find user "{username}"', theme), 404
+            )
+        logging.error("Monkeytype API error for %s: %s", username, e)
         return _svg_response(
-            render_error_svg(f'could not find user "{username}"', theme), 502
+            render_error_svg("monkeytype API error — try again later", theme), 502
+        )
+    except requests.exceptions.RequestException as e:
+        logging.error("Network error fetching %s: %s", username, e)
+        return _svg_response(
+            render_error_svg("could not reach monkeytype — try again later", theme), 502
+        )
+    except Exception:
+        logging.exception("Unexpected error fetching profile for %s", username)
+        return _svg_response(
+            render_error_svg("something went wrong — try again later", theme), 500
         )
 
     if services.monkeytype.is_profile_private(user_profile):
@@ -263,4 +300,4 @@ def render_monkeytype_card(
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=os.environ.get("FLASK_DEBUG", "0") == "1")
