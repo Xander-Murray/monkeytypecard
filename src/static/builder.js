@@ -1,3 +1,7 @@
+if (localStorage.getItem("ui-theme") === "light") {
+  document.body.classList.add("light");
+}
+
 const usernameEl = document.getElementById("username");
 const themeEl = document.getElementById("theme");
 const wordValueEl = document.getElementById("wordValue");
@@ -165,6 +169,12 @@ let debounce;
 usernameEl.addEventListener("input", () => {
   clearTimeout(debounce);
   debounce = setTimeout(preview, 400);
+});
+
+document.getElementById("themeToggle").addEventListener("click", () => {
+  document.body.classList.toggle("light");
+  const mode = document.body.classList.contains("light") ? "light" : "dark";
+  localStorage.setItem("ui-theme", mode);
 });
 
 // Init

@@ -21,6 +21,17 @@
   --font-mono: "Roboto Mono", "SF Mono", "Fira Code", monospace;
 }
 
+body.light {
+  --bg: #e5e5e0;
+  --bg-secondary: #d6d6d1;
+  --surface: #cdcdc8;
+  --border: #b8b8b3;
+  --text: #323437;
+  --text-muted: #959896;
+  --accent: #e2b714;
+  --accent-dim: rgba(226, 183, 20, 0.2);
+}
+
 body {
   font-family: var(--font);
   background: var(--bg);
@@ -32,6 +43,39 @@ body {
 header {
   text-align: center;
   padding: 3rem 1rem 1.5rem;
+  position: relative;
+}
+
+#themeToggle {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  padding: 0.5rem;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  line-height: 0;
+}
+
+#themeToggle .icon-sun,
+#themeToggle .icon-moon {
+  display: none;
+}
+
+#themeToggle .icon-sun {
+  display: block;
+}
+#themeToggle .icon-moon {
+  display: none;
+}
+
+body.light #themeToggle .icon-sun {
+  display: none;
+}
+body.light #themeToggle .icon-moon {
+  display: block;
 }
 
 header h1 {
@@ -353,6 +397,18 @@ button svg {
   letter-spacing: 0.05em;
 }
 
+.preview-card.loading img {
+  opacity: 0;
+}
+
+.preview-card.error {
+  position: relative;
+}
+
+.preview-card.error img {
+  display: none;
+}
+
 .preview-card.error::after {
   content: attr(data-error);
   position: absolute;
@@ -391,6 +447,10 @@ footer .footer-note {
   color: var(--text-muted);
   font-size: 0.7rem;
   opacity: 0.5;
+}
+
+body.light select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23959896' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
 
 /* --- Responsive --- */
