@@ -2,7 +2,11 @@
 
 Generate an SVG stats card for your [Monkeytype](https://monkeytype.com) profile to embed in your GitHub README.
 
-![monkeytypecard example](imgs/example-card.svg)
+Live at **[monkeytypecard.vercel.app](https://monkeytypecard.vercel.app)**
+
+### Live Example
+
+![Monkeytype Stats](https://monkeytypecard.vercel.app/monkeytype.svg?username=punkk&theme=dev&timeValue=15&wordValue=10)
 
 ## Features
 
@@ -18,7 +22,7 @@ Generate an SVG stats card for your [Monkeytype](https://monkeytype.com) profile
 Add this to your GitHub README (replace `YOUR_USERNAME`):
 
 ```markdown
-![Monkeytype Stats](http://YOUR_DEPLOY_URL/monkeytype.svg?username=YOUR_USERNAME)
+![Monkeytype Stats](https://monkeytypecard.vercel.app/monkeytype.svg?username=YOUR_USERNAME)
 ```
 
 ### Query Parameters
@@ -83,6 +87,10 @@ src/
 | `GET /`               | Card builder UI                  |
 | `GET /monkeytype.svg` | Generate SVG card (query params) |
 | `GET /api/themes`     | JSON list of available themes    |
+
+## Deployment
+
+Deployed on **[Vercel](https://vercel.com)** free tier. For deployment instructions, see [DEPLOY.md](DEPLOY.md).
 
 ## Built With
 
