@@ -18,8 +18,15 @@ app = Flask(__name__,
             template_folder=os.path.join(os.path.dirname(__file__), "templates"))
 
 THEMES_PATH = os.path.join(app.static_folder, "themes.json")
-with open(THEMES_PATH) as f:
-    THEMES_LIST = json.load(f)
+try:
+    with open(THEMES_PATH) as f:
+        THEMES_LIST = json.load(f)
+except FileNotFoundError as e:
+    logging.error(f"Failed to load themes: {THEMES_PATH} not found. app.static_folder={app.static_folder}")
+    raise
+except Exception as e:
+    logging.error(f"Failed to load themes from {THEMES_PATH}: {e}")
+    raise
 
 THEMES = {t["name"]: t for t in THEMES_LIST}
 
