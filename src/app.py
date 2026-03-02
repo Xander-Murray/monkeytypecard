@@ -13,7 +13,9 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_folder=os.path.join(os.path.dirname(__file__), "static"),
+            template_folder=os.path.join(os.path.dirname(__file__), "templates"))
 
 THEMES_PATH = os.path.join(app.static_folder, "themes.json")
 with open(THEMES_PATH) as f:
