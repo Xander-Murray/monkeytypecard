@@ -7,3 +7,7 @@ __pycache__/
 CLAUDE.md
 .pytest_cache/
 htmlcov/
+
+requirements-dev.txt
+DEPLOY.md
+.vercel
